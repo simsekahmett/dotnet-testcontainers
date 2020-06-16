@@ -83,7 +83,7 @@ namespace DotNet.Testcontainers.Clients
       };
 
       var stream = await this.Docker.Containers.AttachContainerAsync(id, false, attachParameters, ct);
-      _ = stream.CopyOutputToAsync(Stream.Null, outputConsumer.Stdout, outputConsumer.Stderr, ct);
+      await stream.CopyOutputToAsync(Stream.Null, outputConsumer.Stdout, outputConsumer.Stderr, ct);
     }
 
     public async Task<long> ExecAsync(string id, IList<string> command, CancellationToken ct = default)

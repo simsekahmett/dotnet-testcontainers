@@ -286,31 +286,30 @@ namespace DotNet.Testcontainers.Tests.Unit.Containers.Unix
       [Fact]
       public async Task OutputConsumer()
       {
-        // Given
         using (var consumer = Consume.RedirectStdoutAndStderrToStream(new MemoryStream(), new MemoryStream()))
         {
-          // When
+          // Given
           var testcontainersBuilder = new TestcontainersBuilder<TestcontainersContainer>()
             .WithImage("nginx")
             .WithCommand("/bin/sh", "-c", "hostname > /dev/stdout && hostname > /dev/stderr")
             .WithOutputConsumer(consumer);
 
+          // When
           await using (IDockerContainer testcontainer = testcontainersBuilder.Build())
           {
             await testcontainer.StartAsync();
           }
 
-          consumer.Stdout.Position = 0;
-          consumer.Stderr.Position = 0;
-
           // Then
           using (var streamReader = new StreamReader(consumer.Stdout, leaveOpen: true))
           {
+            streamReader.BaseStream.Position = 0;
             Assert.NotEmpty(await streamReader.ReadToEndAsync());
           }
 
           using (var streamReader = new StreamReader(consumer.Stderr, leaveOpen: true))
           {
+            streamReader.BaseStream.Position = 0;
             Assert.NotEmpty(await streamReader.ReadToEndAsync());
           }
         }
